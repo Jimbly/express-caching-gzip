@@ -112,7 +112,7 @@ and you use set the *enableBrotli* flag to true, express-static-gzip will answer
 
 > GET /main.js >>> /my/cacheFolder/main.js.br
 
-In the end, `cacheFolder` now contains:
+* In the end, `cacheFolder` now contains:
     * text.html.br
     * main.js.br
 
