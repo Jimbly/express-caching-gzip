@@ -43,18 +43,18 @@ function callEach(arr, ...args) {
 /**
  * TODO: add desc
  * @param { string } root: directory to statically serve files from
- * @param { string } cacheDir: directory to cache compressed versions of files in
+ * @param { string | null } cacheDir: directory to cache compressed versions of files in
  * @param { expressCachingGzip.ExpressCachingGzipOptions } options: options to change module behaviour
  * @returns express middleware function
  */
 function expressCachingGzipMiddleware(root, cacheDir, options) {
   assert(typeof root === 'string', 'root is required');
-  assert(typeof cacheDir === 'string', 'cacheDir is required');
+  assert(typeof cacheDir === 'string' || cacheDir === null, 'cacheDir is required (may be null)');
   root = forwardSlashes(root);
-  cacheDir = forwardSlashes(cacheDir);
+  cacheDir = cacheDir ? forwardSlashes(cacheDir) : null;
   let opts = sanitizeOptions(options);
   let serveStaticRoot = serveStatic(root, opts.serveStatic || null);
-  let serveStaticCache = serveStatic(cacheDir, opts.serveStatic || null);
+  let serveStaticCache = cacheDir ? serveStatic(cacheDir, opts.serveStatic || null) : null;
   let compressions = [];
 
   function findCompressionByName(encodingName) {
@@ -217,7 +217,7 @@ function expressCachingGzipMiddleware(root, cacheDir, options) {
         let compression = findCompressionByName(encoding);
         assert(compression);
         let precompressedName = pathname + compression.fileExtension;
-        let cachedName = precompressedName.replace(root, cacheDir);
+        let cachedName = cacheDir ? precompressedName.replace(root, cacheDir) : null;
         assert(cachedName !== precompressedName);
 
         function serveFromCache(err) {
@@ -242,6 +242,7 @@ function expressCachingGzipMiddleware(root, cacheDir, options) {
             callEach(cacheReq.cbs, err);
           }
 
+          assert(cacheDir);
           fs.mkdir(dirname(cachedName), { recursive: true }, function (err) {
             if (err) {
               console.error(`Creating dir for "${cachedName}" failed: ${err}`);
@@ -271,7 +272,7 @@ function expressCachingGzipMiddleware(root, cacheDir, options) {
             return void fallThrough();
           }
           // does not exist
-          if (!uncompressedExists || !compression.compressor) {
+          if (!uncompressedExists || !compression.compressor || !cacheDir) {
             // uncompressed also doesn't exist, or, no compressor, cannot dynamically compress
             return void checkNextEncoding();
           }
@@ -290,6 +291,7 @@ function expressCachingGzipMiddleware(root, cacheDir, options) {
             return void maybeServeCacheLater();
           }
           // check if cache exists
+          assert(cachedName);
           fs.stat(cachedName, function (err, cachedStat) {
             let cacheExists = !err;
             if (cacheRequests[pathname]) {

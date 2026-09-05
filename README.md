@@ -16,7 +16,7 @@ The cache of compressed files can be deleted at any time (even while a server is
 ```
 
 # Usage
-In case you just want to serve compressed brotli or gzipped files upon demand, this simple example would do:
+In case you just want to serve compressed brotli or gzipped files upon demand, follow this example:
 
 ```javascript
 var express = require('express');
@@ -28,6 +28,15 @@ app.use('/', expressCachingGzip('/my/rootFolder/', '/my/cacheFolder/', {
   orderPreference: ['br'],
 }));
 ```
+
+* The parameters to `expressCachingGzip(rootDir, cacheDir, options)`:
+  * **`rootDir`**: The directory from which to serve files - no modifications will be made to these files.
+  * **`cacheDir`**: The directory in which to place compressed files
+    * This directory and subdirectories will be created as required to cache compressed files
+    * No files will ever be deleted (though they *will* be overwritten) unless you call `expressCachingGzip.cleanupCache(...)`
+    * This directory should be different than `rootDir`, or unexpected results will happen (file A is compressed to A.gz, then file A changes, but the old A.gz will serve because it looks like a precompressed version sitting next to it)
+    * Any errors writing to the cache will only be reported via `console.error`, the server will function without problem if the cache directory is unwritable, etc
+    * If you pass `null`, no attempts to cache will happen (this module will function identically to `express-static-gzip`, except that it will handle new pre-compressed files being added at runtime)
 
 Gzip compression is always enabled, and it is recommended to enable *brotli* using the **options.enableBrotli** flag.
 

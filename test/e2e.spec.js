@@ -517,6 +517,7 @@ describe('End to end', function () {
     });
 
     it('should handle malformed uri with plain node response object', function () {
+        binaryMode = false;
         const middleware = expressCachingGzip(__dirname + '/wwwroot', __dirname + '/compress-cache');
         const req = {headers: {}, path: '/%c0', url: '/%c0'};
         const res = {
@@ -543,6 +544,7 @@ describe('End to end', function () {
 
     it('should not corrupt req.url', function () {
         const app = express();
+        binaryMode = false;
         app.use(expressCachingGzip(__dirname + '/wwwroot', __dirname + '/compress-cache', { index: 'notfound.html' }));
         app.use(expressCachingGzip(__dirname + '/wwwroot', __dirname + '/compress-cache'));
         server = app.listen(8181);
@@ -572,4 +574,27 @@ describe('End to end', function () {
             });
         });
     });
+
+    it('should handle null cache', function () {
+        if (fs.existsSync(cacheDir)) {
+            fs.rmSync(cacheDir, { recursive: true });
+        }
+        const app = express();
+        binaryMode = false;
+        app.use(expressCachingGzip(__dirname + '/wwwroot', null));
+        server = app.listen(8181);
+
+        return requestFile('/').then((resp) => {
+            expect(resp.statusCode).to.equal(200);
+            expect(resp.body).to.equal('index.html');
+
+            return new Promise((resolve, reject) => {
+                setTimeout(function () {
+                    expect(fs.existsSync(cacheDir)).to.equal(false);
+                    resolve();
+                }, 5);
+            });
+        });
+    });
+
 });

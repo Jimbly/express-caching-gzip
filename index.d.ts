@@ -13,10 +13,10 @@ import * as serverStatic from "serve-static";
  * It extends serveStatic with the capability to serve (previously) gziped files. For this
  * it asumes, the gziped files are next to the original files.
  * @param root folder to statically serve files from
- * @param cacheDir folder to store and serve dynamically compressed files in
+ * @param cacheDir folder to store and serve dynamically compressed files in, or null for no caching
  * @param options options to configure expressCachingGzip
  */
-declare function expressCachingGzip(root: string, cacheDir: string, options?: expressCachingGzip.expressCachingGzipOptions): (req: any, res: any, next: any) => any;
+declare function expressCachingGzip(root: string, cacheDir: string | null, options?: expressCachingGzip.expressCachingGzipOptions): (req: any, res: any, next: any) => any;
 
 declare namespace expressCachingGzip {
     /**
