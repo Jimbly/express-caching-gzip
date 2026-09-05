@@ -1,6 +1,6 @@
 {
   "name": "express-caching-gzip",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "wrapper on top of serve-static, that allows serving gzip/brotli'd files either dynamically or pre-generated",
   "main": "index.js",
   "types": "index.d.ts",
