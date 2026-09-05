@@ -171,8 +171,11 @@ function expressCachingGzipMiddleware(root, cacheDir, options) {
     if (!pathname) {
       pathname = '/';
     }
+    while (pathname.startsWith('/')) {
+      pathname = pathname.slice(1);
+    }
     try {
-      pathname = resolvePath(root, pathname.slice(1));
+      pathname = resolvePath(root, pathname);
     } catch (e) {
       return void sendBadRequest(res, e.message);
     }

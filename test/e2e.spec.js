@@ -612,4 +612,13 @@ describe('End to end', function () {
         });
     });
 
+    it('should handle slightly malformed URLs', function () {
+        setupServer();
+
+        return requestFile('//index.html').then(resp => {
+            expect(resp.statusCode).to.equal(200);
+            expect(resp.body).to.equal('index.html');
+        });
+    });
+
 });
