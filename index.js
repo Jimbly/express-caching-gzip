@@ -4,7 +4,7 @@ const fs = require('fs');
 const { dirname } = require('path');
 const parseUrl = require('parseurl')
 const { pipeline } = require('stream');
-const { createBrotliCompress, createGzip } = require('zlib');
+const { createBrotliCompress, createGzip, constants: zlibConstants } = require('zlib');
 const resolvePath = require('resolve-path')
 const serveStatic = require('serve-static');
 const mime = require('mime-types');
@@ -84,7 +84,11 @@ function expressCachingGzipMiddleware(root, cacheDir, options) {
   function compressorBrotli(pathin, pathout, done) {
     pipeline(
       fs.createReadStream(pathin),
-      createBrotliCompress(),
+      createBrotliCompress({
+        params: {
+          [zlibConstants.BROTLI_PARAM_QUALITY]: zlibConstants.BROTLI_DEFAULT_QUALITY,
+        },
+      }),
       fs.createWriteStream(pathout),
       (err) => done(err)
     );
