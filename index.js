@@ -1,7 +1,7 @@
 /* eslint no-restricted-syntax:off */
 const assert = require('assert');
 const fs = require('fs');
-const { dirname } = require('path');
+const { dirname, resolve } = require('path');
 const parseUrl = require('parseurl')
 const { pipeline } = require('stream');
 const { createBrotliCompress, createGzip, constants: zlibConstants } = require('zlib');
@@ -50,8 +50,8 @@ function callEach(arr, ...args) {
 function expressCachingGzipMiddleware(root, cacheDir, options) {
   assert(typeof root === 'string', 'root is required');
   assert(typeof cacheDir === 'string' || cacheDir === null, 'cacheDir is required (may be null)');
-  root = forwardSlashes(root);
-  cacheDir = cacheDir ? forwardSlashes(cacheDir) : null;
+  root = forwardSlashes(resolve(root));
+  cacheDir = cacheDir ? forwardSlashes(resolve(cacheDir)) : null;
   let opts = sanitizeOptions(options);
   let serveStaticRoot = serveStatic(root, opts.serveStatic || null);
   let serveStaticCache = cacheDir ? serveStatic(cacheDir, opts.serveStatic || null) : null;

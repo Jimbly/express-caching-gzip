@@ -597,4 +597,19 @@ describe('End to end', function () {
         });
     });
 
+    it('should handle relative root', function () {
+        if (fs.existsSync(cacheDir)) {
+            fs.rmSync(cacheDir, { recursive: true });
+        }
+        const app = express();
+        binaryMode = false;
+        app.use(expressCachingGzip('test/wwwroot', null));
+        server = app.listen(8181);
+
+        return requestFile('/').then((resp) => {
+            expect(resp.statusCode).to.equal(200);
+            expect(resp.body).to.equal('index.html');
+        });
+    });
+
 });
